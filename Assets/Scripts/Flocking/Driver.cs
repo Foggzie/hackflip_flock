@@ -14,28 +14,23 @@ namespace Flocking
 	{
 		public Vector2 Position
 		{
-			get
-			{
-				return new Vector2(transform.position.x, transform.position.z);
-			}
-			set
-			{
-				transform.position = new Vector3(value.x, transform.position.y, value.y);
-			}
+			get { return new Vector2(transform.position.x, transform.position.z); }
+			set { transform.position = new Vector3(value.x, transform.position.y, value.y); }
 		}
 
 		public Vector2 Velocity { get; private set; }
 
 		private void Awake()
 		{
-			socialFrame = Rand.Range(0, 5); // [0,5)
+			socialFrame = Rand.Range(0, 5);
 		}
 
 		public void Initialize(float simluationScale, float boundsRadiusSq, Socializer socializer)
 		{
 			maxSpeed = simluationScale * 1.0f;
-			wanderWeight = simluationScale * 0.25f;
+			wanderWeight = simluationScale * 0.2f;
 			accordanceWeight = simluationScale * 0.05f;
+			avoidanceWeight = simluationScale * 1.0f;
 
 			this.boundsRadiusSq = boundsRadiusSq;
 			this.socializer = socializer;
@@ -61,14 +56,20 @@ namespace Flocking
 			Vector2 flockDirection = GetFlockDirection();
 			Vector2 avoidDirection = GetAvoidDirection();
 			Vector2 accordance = GetAccordance();
-			Vector2 bounds = GetBounds();
+			Vector2 bounds = Vector2.zero;// GetBounds();
 			Vector2 wander = GetWander();
 
 			Velocity = Velocity + flockDirection + avoidDirection + accordance + bounds + wander;
 			Velocity = Vector2.ClampMagnitude(Velocity, maxSpeed);
 			Position += Velocity;
 
-			transform.rotation = Quaternion.LookRotation(Velocity);
+			var diff = Position.sqrMagnitude - boundsRadiusSq;
+			if (diff > 0) 
+			{
+				Position = -Position;
+				Position *= 0.99f;
+			}
+//			transform.rotation = Quaternion.LookRotation(Velocity);
 		}
 
 		/// <summary>Helps align with the flock.</summary>
@@ -100,7 +101,7 @@ namespace Flocking
 			}
 
 			average = (count > 1) ? (average / count) : average;
-			return average;
+			return average * avoidanceWeight;
 		}
 
 		/// <summary>Helps a flock stay together.</summary>
@@ -153,6 +154,7 @@ namespace Flocking
 
 		private float maxSpeed;
 		private float wanderWeight;
+		private float avoidanceWeight;
 		private float accordanceWeight;
 		private float boundsRadiusSq;
 

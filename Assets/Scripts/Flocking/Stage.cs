@@ -6,6 +6,7 @@ namespace Flocking
 {
 	public class Stage : MonoBehaviour
 	{
+		[SerializeField] private Material lineMaterial;
 		[SerializeField] private GameObject driverPrefab;
 
 		[SerializeField] private float simulationScale;
@@ -27,7 +28,7 @@ namespace Flocking
 			boundsRadiusSq = boundsRadius * boundsRadius;
 
 			// Make Drivers
-			for (int i = 0; i < 50; ++i)
+			for (int i = 0; i < 150; ++i)
 			{
 				InstantiateDriver(new Vector2(
 					Random.Range(-boundsRadius, boundsRadius),
@@ -87,14 +88,14 @@ namespace Flocking
 
 		private void CreateBoundsRenderer(float radius, int segments)
 		{
-
 			var line = gameObject.AddComponent<LineRenderer>();
 			line.numPositions = segments + 1;
 			line.useWorldSpace = true;
 			line.startColor = Color.white;
 			line.endColor = Color.white;
-			line.startWidth = 1.0f;
-			line.endWidth = 1.0f;
+			line.startWidth = 0.25f;
+			line.endWidth = 0.25f;
+			line.material = lineMaterial;
 
 			float angle = 0.0f;
 			float stepSize = 360.0f / segments;
