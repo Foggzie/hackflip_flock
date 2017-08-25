@@ -37,7 +37,7 @@ namespace Flocking
 			wanderWeight = simluationScale * 0.25f;
 			accordanceWeight = simluationScale * 0.05f;
 
-			this.boundsRadiusSq = boundsRadiusSq * 95.0f;
+			this.boundsRadiusSq = boundsRadiusSq;
 			this.socializer = socializer;
 		}
 
@@ -67,6 +67,8 @@ namespace Flocking
 			Velocity = Velocity + flockDirection + avoidDirection + accordance + bounds + wander;
 			Velocity = Vector2.ClampMagnitude(Velocity, maxSpeed);
 			Position += Velocity;
+
+			transform.rotation = Quaternion.LookRotation(Velocity);
 		}
 
 		/// <summary>Helps align with the flock.</summary>
@@ -131,7 +133,7 @@ namespace Flocking
 			var differenceSq = Position.sqrMagnitude - boundsRadiusSq;
 			if (differenceSq > 0)
 			{
-				return -(Position).normalized * (float)Math.Sqrt(differenceSq) * 0.005f;
+				return -(Position).normalized * (float)Math.Sqrt(differenceSq) * 0.05f;
 			}
 			else
 			{

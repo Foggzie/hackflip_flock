@@ -18,20 +18,24 @@ namespace Flocking
 
 		private void Awake()
 		{
-			var flockRadius = simulationScale * 60.0f;
+			var flockRadius = simulationScale * 30.0f;
 			var friendRadius = flockRadius / 1.3f;
-			var boundsRadius = simulationScale * 10.0f;
+			var boundsRadius = simulationScale * 150.0f;
 
 			flockRadiusSq = flockRadius * flockRadius;
 			friendRadiusSq = friendRadius * friendRadius;
 			boundsRadiusSq = boundsRadius * boundsRadius;
 
-			InstantiateDriver(new Vector2(0.0f, 0.0f));
-			InstantiateDriver(new Vector2(1.0f, 1.0f));
-			InstantiateDriver(new Vector2(2.0f, 2.0f));
-			InstantiateDriver(new Vector2(3.0f, 3.0f));
-			InstantiateDriver(new Vector2(4.0f, 4.0f));
-			InstantiateDriver(new Vector2(5.0f, 5.0f));
+			// Make Drivers
+			for (int i = 0; i < 50; ++i)
+			{
+				InstantiateDriver(new Vector2(
+					Random.Range(-boundsRadius, boundsRadius),
+					Random.Range(-boundsRadius, boundsRadius)));
+			}
+
+			// Make a circle
+			CreateBoundsRenderer(boundsRadius, 100);
 		}
 
 		private void Update()
@@ -78,6 +82,27 @@ namespace Flocking
 						flock.Add(neighbor);
 					}
 				}
+			}
+		}
+
+		private void CreateBoundsRenderer(float radius, int segments)
+		{
+
+			var line = gameObject.AddComponent<LineRenderer>();
+			line.numPositions = segments + 1;
+			line.useWorldSpace = true;
+			line.startColor = Color.white;
+			line.endColor = Color.white;
+			line.startWidth = 1.0f;
+			line.endWidth = 1.0f;
+
+			float angle = 0.0f;
+			float stepSize = 360.0f / segments;
+			for (int i = 0; i < segments + 1; ++i, angle += stepSize)
+			{
+				float x = Mathf.Sin(Mathf.Deg2Rad * angle) * radius;
+				float y = Mathf.Cos(Mathf.Deg2Rad * angle) * radius;
+				line.SetPosition(i, new Vector3(x, 0.0f, y));
 			}
 		}
 	}
